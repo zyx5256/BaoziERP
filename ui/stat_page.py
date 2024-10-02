@@ -1,14 +1,16 @@
 from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
 
+TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 
 class StatWindow(QtWidgets.QWidget):
-    def __init__(self, db_manager):
+    def __init__(self, db_manager, columns):
         super().__init__()
         self.db_manager = db_manager
-        self.initUI()
+        self.initUI(columns)
 
-    def initUI(self):
+    def initUI(self, columns):
         self.setWindowTitle("Statistics")
 
         layout = QtWidgets.QVBoxLayout(self)
@@ -29,14 +31,13 @@ class StatWindow(QtWidgets.QWidget):
         layout.addWidget(self.calculate_button)
 
         self.result_table = QtWidgets.QTableWidget()
-        self.result_table.setColumnCount(6)
-        self.result_table.setHorizontalHeaderLabels(["物品名", "单位", "规格", "数量", "价格", "添加时间"])
+        self.result_table.setColumnCount(len(columns))
+        self.result_table.setHorizontalHeaderLabels(columns)
         self.result_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.result_table.setSortingEnabled(True)
         layout.addWidget(self.result_table)
 
         self.setGeometry(300, 300, 800, 400)
-        self.show()
 
     def calculate_stats(self):
         try:
@@ -50,8 +51,8 @@ class StatWindow(QtWidgets.QWidget):
 
             items = self.db_manager.fetch_all_items()
             for item in items:
-                name, unit, quantity_per_unit, amount, price, date_time = item
-                date_time = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
+                name, category, quantity_per_unit, unit, amount, price, date_time = item
+                date_time = datetime.strptime(date_time, TIME_FORMAT)
 
                 if from_date <= date_time <= to_date:
                     if name not in input_amount:
@@ -66,11 +67,12 @@ class StatWindow(QtWidgets.QWidget):
                     row_position = self.result_table.rowCount()
                     self.result_table.insertRow(row_position)
                     self.result_table.setItem(row_position, 0, QtWidgets.QTableWidgetItem(name))
-                    self.result_table.setItem(row_position, 1, QtWidgets.QTableWidgetItem(unit))
+                    self.result_table.setItem(row_position, 1, QtWidgets.QTableWidgetItem(category))
                     self.result_table.setItem(row_position, 2, QtWidgets.QTableWidgetItem(str(quantity_per_unit)))
-                    self.result_table.setItem(row_position, 3, QtWidgets.QTableWidgetItem(str(amount)))
-                    self.result_table.setItem(row_position, 4, QtWidgets.QTableWidgetItem(str(price)))
-                    self.result_table.setItem(row_position, 5, QtWidgets.QTableWidgetItem(date_time.strftime("%Y-%m-%d %H:%M:%S")))
+                    self.result_table.setItem(row_position, 3, QtWidgets.QTableWidgetItem(unit))
+                    self.result_table.setItem(row_position, 4, QtWidgets.QTableWidgetItem(str(amount)))
+                    self.result_table.setItem(row_position, 5, QtWidgets.QTableWidgetItem(str(price)))
+                    self.result_table.setItem(row_position, 6, QtWidgets.QTableWidgetItem(date_time.strftime(TIME_FORMAT)))
 
             result = "Statistics from {} to {}:\n".format(from_date.date(), to_date.date())
             for name in input_amount:
