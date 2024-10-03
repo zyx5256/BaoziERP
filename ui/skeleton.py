@@ -1,5 +1,6 @@
 from database.db_mgr import DatabaseManager
 from ui.stat_page import StatWindow
+from ui.main_page import MainPage
 from backend.main_page_controller import MainPageCtrl
 from utils.utils import *
 from utils.log import *
@@ -7,15 +8,12 @@ from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
 
 
-class MainPageSkeleton:
-    def __init__(self, main_page):
+class Skeleton:
+    def __init__(self):
         # constants
         self.columns = ["物品名", "种类", "规格", "单位", "数量", "单价", "日期"]
         self.category_list = ["成品", "商品", "原辅料"]
         self.unit_list = ["kg", "g", "l", "ml", "个"]
-
-        # main page
-        self.main_page = main_page
 
         # database
         self.db_manager = DatabaseManager()
@@ -24,9 +22,7 @@ class MainPageSkeleton:
         self.history_stats = QtWidgets.QLabel("")
         self.history_table = QtWidgets.QTableWidget()
         self.set_history_table()
-
-        # windows
-        self.stat_window = StatWindow(self.db_manager, self.columns)
+        self.history_table.itemSelectionChanged.connect(self.populate_fields)
 
         # helpers
         self.controller = MainPageCtrl(self, self.db_manager, self.history_table, self.history_stats)
@@ -40,29 +36,28 @@ class MainPageSkeleton:
         self.price_entry = QtWidgets.QLineEdit()
         self.date_selector = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         self.date_selector.setCalendarPopup(True)
-
-        self.history_table.itemSelectionChanged.connect(self.populate_fields)
         self.date_selector.dateChanged.connect(self.controller.on_date_changed)
+        self.entries = [self.item_name, self.category, self.quantity_entry, self.unit, self.amount_entry,
+                        self.price_entry, self.date_selector]
 
         # buttons
-        self.add_item = self.add_button("进库", self.controller.add_item)
-        self.remove_item = self.add_button("出库", self.controller.remove_item)
-        self.modify_item = self.add_button("修改条目", self.controller.modify_item)
+        self.add_record = self.add_button("进库", self.controller.add_record)
+        self.remove_record = self.add_button("出库", self.controller.remove_record)
+        self.modify_record = self.add_button("修改条目", self.controller.modify_record)
         self.export_to_csv = self.add_button("导出CSV", self.controller.export_to_csv)
         self.show_previous_day = self.add_button("前一天", self.controller.show_previous_day)
         self.show_next_day = self.add_button("后一天", self.controller.show_next_day)
         self.show_statistics_page = self.add_button("统计页面", self.controller.show_statistics_page)
+        self.buttons = [self.add_record, self.remove_record, self.modify_record, self.export_to_csv,
+                        self.show_previous_day, self.show_next_day, self.show_statistics_page]
+
+        # pages
+        self.main_page = MainPage(self.history_table, self.history_stats, self.columns, self.entries, self.buttons)
+        self.stat_window = StatWindow(self.db_manager, self.columns)
 
         # init data
         self.category.addItems(self.category_list)
         self.unit.addItems(self.unit_list)
-
-        self.entries = [self.item_name, self.category, self.quantity_entry, self.unit, self.amount_entry,
-                        self.price_entry, self.date_selector]
-        self.buttons = [self.add_item, self.remove_item, self.modify_item, self.export_to_csv, self.show_previous_day,
-                        self.show_next_day, self.show_statistics_page]
-
-        self.controller.update_statistics(self.db_manager.fetch_all_items())
 
     def set_history_table(self):
         self.history_table.setColumnCount(len(self.columns))

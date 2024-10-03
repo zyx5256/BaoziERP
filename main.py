@@ -1,8 +1,8 @@
 import sys
 from PyQt5 import QtWidgets
-from ui.main_page import MainPage
+from ui.skeleton import Skeleton
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    ex = MainPage()
+    ex = Skeleton()
     sys.exit(app.exec_())

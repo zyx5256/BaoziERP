@@ -22,7 +22,7 @@ class DatabaseManager:
         ''')
         self.conn.commit()
 
-    def add_item(self, name, category, quantity_per_unit, unit, amount, price, first_add_time):
+    def add_record(self, name, category, quantity_per_unit, unit, amount, price, first_add_time):
         add_query = """
                     INSERT INTO inventory (name, category, quantity_per_unit, unit, amount, price, first_add_time)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -32,8 +32,8 @@ class DatabaseManager:
         self.conn.commit()
         print("New record input updated to DB")
 
-    def update_item(self, name, category, quantity_per_unit, unit, amount, price, first_add_time):
-        # Update the item in the database
+    def update_record(self, name, category, quantity_per_unit, unit, amount, price, first_add_time):
+        # Update the record in the database
         update_query = """
                        UPDATE inventory 
                        SET category = ?, quantity_per_unit = ?, unit = ?, amount = ?, price = ?
@@ -47,7 +47,7 @@ class DatabaseManager:
             return
         print("New record modify updated to DB")
 
-    def fetch_all_items(self):
+    def fetch_all_records(self):
         fetch_query = 'SELECT name, category, quantity_per_unit, unit, amount, price, first_add_time FROM inventory'
         self.cursor.execute(fetch_query)
         return self.cursor.fetchall()

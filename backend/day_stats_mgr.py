@@ -9,13 +9,13 @@ class DayStatsMgr:
         self.history_stats = history_stats
         return
 
-    def update_cur_prod_stats(self, items):
+    def update_cur_prod_stats(self, records):
         input_amount = {}
         output_amount = {}
         name_unit = {}
 
-        for item in items:
-            name, category, _, unit, amount, _, _ = item
+        for record in records:
+            name, category, _, unit, amount, _, _ = record
 
             if not category == "成品":
                 continue
@@ -38,18 +38,18 @@ class DayStatsMgr:
 
         self.history_stats.setText(result)
 
-    def update_history_table(self, items):
-        for item in items:
+    def update_history_table(self, records):
+        for record in records:
             next_row_pos = self.history_table.rowCount()
             self.history_table.insertRow(next_row_pos)
-            for i in range(len(item)):
-                self.history_table.setItem(next_row_pos, i, QtWidgets.QTableWidgetItem(str(item[i])))
+            for i in range(len(record)):
+                self.history_table.setItem(next_row_pos, i, QtWidgets.QTableWidgetItem(str(record[i])))
 
-    def update_statistics(self, selected_date, items):
+    def update_statistics(self, selected_date, records):
         from_date = datetime.combine(selected_date, datetime.min.time())
         to_date = from_date + timedelta(days=1)
-        items = [item for item in items if from_date <= datetime.strptime(item[6], TIME_FORMAT) < to_date]
+        records = [record for record in records if from_date <= datetime.strptime(record[6], TIME_FORMAT) < to_date]
 
         self.history_table.setRowCount(0)
-        self.update_cur_prod_stats(items)
-        self.update_history_table(items)
+        self.update_cur_prod_stats(records)
+        self.update_history_table(records)
