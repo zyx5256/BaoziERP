@@ -1,18 +1,18 @@
 from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
-
-TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+from utils.utils import TIME_FORMAT
 
 
 class StatWindow(QtWidgets.QWidget):
     def __init__(self, db_manager, columns):
         super().__init__()
+        self.title = "Statistics"
         self.db_manager = db_manager
+
+        self.setWindowTitle(self.title)
         self.initUI(columns)
 
     def initUI(self, columns):
-        self.setWindowTitle("Statistics")
-
         layout = QtWidgets.QVBoxLayout(self)
 
         form_layout = QtWidgets.QFormLayout()

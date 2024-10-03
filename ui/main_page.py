@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-from backend.main_page_skeleton import MainPageSkeleton
+from ui.main_page_skeleton import MainPageSkeleton
 
 
 class MainPage(QtWidgets.QMainWindow):
