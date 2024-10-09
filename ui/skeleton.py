@@ -59,33 +59,40 @@ class Skeleton:
         self.category.addItems(self.category_list)
         self.unit.addItems(self.unit_list)
 
+    @func_trace
     def set_history_table(self):
         self.history_table.setColumnCount(len(self.columns))
         self.history_table.setHorizontalHeaderLabels(self.columns)
         self.history_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.history_table.setSortingEnabled(True)
 
+    @func_trace
     def add_button(self, name, action):
         button = QtWidgets.QPushButton(name)
         button.clicked.connect(action)
         return button
 
+    @func_trace
     def show_message(self, level, title, msg):
+        logger.info(f"Show message {title}:{msg}")
         msg_func = None
-        if level == MsgLevel.INFO:
+        if level == logging.INFO:
             msg_func = QtWidgets.QMessageBox.information
-        elif level == MsgLevel.WARN:
+        elif level == logging.WARN:
             msg_func = QtWidgets.QMessageBox.warning
-        elif level == MsgLevel.ERROR:
+        elif level == logging.ERROR:
             msg_func = QtWidgets.QMessageBox.critical
         else:
-            print(f"level not exist: {level}")
+            logger.error(f"level not exist: {level}")
+            logger.info("<-")
             return
         msg_func(self.main_page, title, msg)
 
+    @func_trace
     def validate_inputs(self):
         if not self.item_name.text():
-            self.show_message(MsgLevel.WARN, "输入错误", "物品名不能为空!")
+            self.show_message(logging.WARN, "输入错误", "物品名不能为空!")
+            logger.info("<-")
             return False
 
         try:
@@ -93,13 +100,15 @@ class Skeleton:
             float(self.amount_entry.text())
             float(self.price_entry.text())
         except ValueError:
-            self.show_message(MsgLevel.WARN, "输入错误", "规格, 数量, 价格必须为有效数字!")
+            self.show_message(logging.WARN, "输入错误", "规格, 数量, 价格必须为有效数字!")
+            logger.info("<-")
             return False
-
         return True
 
+    @func_trace
     def get_string_of_inputs(self):
         if not self.validate_inputs():
+            logger.info("<-")
             return None
 
         name = self.item_name.text()
@@ -110,11 +119,14 @@ class Skeleton:
         price = float(self.price_entry.text())
         first_add_time = datetime.now().strftime(TIME_FORMAT)
 
+        logger.info("<-")
         return [name, category, quantity_per_unit, unit, amount, price, first_add_time]
 
+    @func_trace
     def populate_fields(self):
         selected_row = self.history_table.currentRow()
         if selected_row < 0:
+            logger.info("<-")
             return
 
         self.item_name.setText(self.history_table.item(selected_row, 0).text())
@@ -124,4 +136,3 @@ class Skeleton:
         self.amount_entry.setText(self.history_table.item(selected_row, 4).text())
         self.price_entry.setText(self.history_table.item(selected_row, 5).text())
         # TODO: Add last modify time
-

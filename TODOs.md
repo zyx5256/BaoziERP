@@ -16,4 +16,4 @@
 
 - TODO
 1. Add UUID to database to check and remove duplicate items
-2. Add logs to trace all operations.
+2. Add logs to trace all operations. -- Done
